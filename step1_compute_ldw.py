@@ -10,8 +10,8 @@ import math
 #%%
 # Load data
 def load_data():
-    asd_data = np.load('./data/2_power_asd.npy', allow_pickle=True)
-    td_data = np.load('./data/2_power_td.npy',allow_pickle=True)
+    asd_data = np.load('./data/power_asd.npy', allow_pickle=True)
+    td_data = np.load('./data/power_td.npy',allow_pickle=True)
     
     # Restructure data
     data = np.concatenate((asd_data,td_data))
