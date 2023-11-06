@@ -7,18 +7,10 @@ We used a C-PAC pipeline (Cameron et al., 2013) preprocessed fMRI dataset from t
 - Ages between 11 and 23
 - fMRI acquisition sites: New York University, University of California Los Angeles 1, and University of Utah, School of Medicine
 
-<<<<<<< Updated upstream
-We performed parcellation using the Power et al.'s brain atlas (Power et al., 2011) to extract the mean time series for a total of 264 regions of interest (ROIs).
-=======
 ** Note: The preprocessed dataset is located in the `/data` folder, and it includes two files: `power_asd.npy` and `power_td.npy`. These files contain time series signals extracted using the Power et al. brain atlas (Power et al., 2011), which defines 264 Regions of Interest (ROIs). The dataset comprises 70 subjects with autism spectrum disorders (ASD) and 74 typically developed (TD) subjects.
->>>>>>> Stashed changes
 
 ## References:
 - Cameron, C.; Sharad, S.; Brian, C.; Ranjeet, K.; Satrajit, G.; Chaogan, Y.; Qingyang, L.; Daniel, L.; Joshua, V.; Randal, B.; Stanley, C.; Maarten, M.; Clare, K.; Adriana, D. M.; Francisco, C.; and Michael, M. 2013. Towards automated analysis of connectomes: The configurable pipeline for the analysis of connectomes (C-PAC). Front. Neuroinform., 7.
 - Di Martino, A.; Ross, K.; Uddin, L. Q.; Sklar, A. B.; Castellanos, F. X.; and Milham, M. P. 2009. Functional brain correlates of social and nonsocial processes in autism spectrum disorders: an activation likelihood estimation meta-analysis. Biological psychiatry, 65(1): 63–74.
 - Plitt, M.; Barnes, K. A.; and Martin, A. 2015. Functional connectivity classification of autism identifies highly predictive brain features but fallsshort of biomarker standards. NeuroImage Clin., 7: 359–366.
-<<<<<<< Updated upstream
 - Power, J. D.; Cohen, A. L.; Nelson, S. M.; Wig, G. S.; Barnes, K. A.; Church, J. A.; Vogel, A. C.; Laumann, T. O.; Miezin, F. M.; Schlaggar, B. L.; and Petersen, S. E. 2011. Functional network organization of the human brain. Neuron, 72(4): 665–678.
-=======
-- Power, J. D.; Cohen, A. L.; Nelson, S. M.; Wig, G. S.; Barnes, K. A.; Church, J. A.; Vogel, A. C.; Laumann, T. O.; Miezin, F. M.; Schlaggar, B. L.; and Petersen, S. E. 2011. Functional network organization of the human brain. Neuron, 72(4): 665–678.
->>>>>>> Stashed changes
