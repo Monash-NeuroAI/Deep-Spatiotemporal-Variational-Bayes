@@ -28,7 +28,7 @@ print(partition)
 
 # %%
 # Initialize training
-savePATH = '/home/admin01/Junn/TCM/VGRN_Junn/Junn/saved_models/FINAL/VGRNN_softmax_adv_fold'\
+savePATH = '/saved_models/FINAL/VGRNN_softmax_adv_fold'\
 +str(outer_loop)+str(inner_loop)+'_16.10_v-h'
 loadPATH = savePATH
 
@@ -42,7 +42,7 @@ lr_annealType = 'ReduceLROnPlateau'
 lr_annealType = [lr_annealType, lr_annealType]
 
 setting = {
-'rngPATH': r"/home/admin01/Junn/TCM/VGRN_Junn/Junn/saved_models/FINAL/VGRNN_softmax_adv_fold21_16.0_vdh",
+'rngPATH': r"/saved_models/FINAL/VGRNN_softmax_adv_fold21_16.0_vdh",
 'model_params': model_params,
 'recurrent': True,
 'learnRate': [0.00001, 0.00001],
