@@ -107,8 +107,6 @@ class GraphDecoder(nn.Module):
 	def forward_sb(self, z):
 		z = F.dropout(z, self.dropout, training=self.training)
 		adj = z @ torch.transpose(z, dim0=-2, dim1=-1)
-		# corr = self.cov2corr(cov)
-		# corr_abs = torch.abs(corr)
 		if self.act is not None:
 			adj = self.act(adj)
 		return adj
@@ -145,7 +143,6 @@ class GraphClassifier(nn.Module):
 		self.linear = dense_vary(input_dim, layer_dims, output_dim, last_act=None, dropout=dropout, batch_norm=batch_norm)
 
 	def forward(self, input, target, sample=False):
-		# input = F.dropout(input, self.dropout, training=self.training)
 		y_logit = self.linear(input)
 		y_bce = self.loss(y_logit, target)
 		with torch.no_grad():
@@ -168,7 +165,6 @@ class GraphClassifier(nn.Module):
 		if logit.shape[-1] > 1:
 			prob = F.softmax(logit, dim=-1)
 			pred = torch.argmax(prob, dim=-1).float()
-			# pred = torch.gather(torch.round(prob),-1,target.unsqueeze(-1)).squeeze(-1)
 			acc = torch.abs(target - pred)
 		else:
 			prob = torch.sigmoid(logit.squeeze(-1))
@@ -297,13 +293,10 @@ class VGRNN(torch.nn.Module):
 		# Initiate containers
 		Mask = []; Last = []
 		x_NLL = []; z_KLD = []; adj_NLL = []
-		# y_BCE = []; y_ACC = []
 		Readout = []; Target= []
-		# x_NLL = torch.zeros(1).to(self.device); z_KLD = torch.zeros(1).to(self.device)
-		# adj_NLL = torch.zeros(1).to(self.device); y_BCE = torch.zeros(1).to(self.device)
+
 		if sample:
 			z_Sample = []; adj_Sample = []; h_Sample = []; zh_Sample = []
-			# x_Sample = []; y_Prob = []
 
 		# Initiate rnn hidden
 		batch_size = graphs[0].num_graphs
@@ -388,44 +381,35 @@ class VGRNN(torch.nn.Module):
 			# x_sample_sb = self.reparameterize_normal(x_dec_mean_sb, x_dec_std_sb)
 
 			# Readout layer
-			# z_readout = z_phi
 			z_readout_sb = self.phi_z(z_enc_mean_sb)
 			if self.recurrent:
 				readout_sb = torch.cat([z_readout_sb, h_sb], dim=-1)
 			else:
 				readout_sb = z_readout_sb
 			readout_flatten = readout_sb.flatten(start_dim=1, end_dim=2)
-			# readout_in = global_mean_pool(readout_in, batch)
-			# Graph Classifier
-			# y_bce_sb, y_acc_sb, y_prob_sb = self.classifier(readout_in_sb, y)
 
 			# Containers append
 			Mask.append(mask); Last.append(last)
-			# x_NLL.append(x_nll_sb*mask)
 			z_KLD.append(z_kld_sb); adj_NLL.append(adj_nll_sb)
-			# y_BCE.append(y_bce_sb), y_ACC.append(y_acc_sb)
 			Readout.append(readout_flatten)
 			Target.append(y)
 
 			if sample: 
-				# x_Sample.append(x_sample_sb*mask)
 				z_Sample.append(z_sample_sb)
 				adj_Sample.append(torch.sigmoid(adj_dec_sb))
 				h_Sample.append(h_sb)
 				zh_Sample.append(zh_sb)
-				# y_Prob.append(y_prob_sb*mask)
 
 		Mask = torch.stack(Mask)
 		SeqLen = Mask.sum(dim=0)
-		# x_NLL = ((torch.stack(x_NLL)*Mask).sum(dim=0) / SeqLen).mean()
+		
 		x_NLL = torch.zeros(1).to(self.device)
 		z_KLD = ((torch.stack(z_KLD)*Mask).sum(dim=0) / SeqLen).mean()
 		adj_NLL = ((torch.stack(adj_NLL)*Mask).sum(dim=0) / SeqLen).mean()
 
 		Last = torch.stack(Last)
 		assert Last.sum() == batch_size
-		# y_BCE = torch.stack(y_BCE)[Last].mean()
-		# y_ACC = torch.stack(y_ACC)[Last].mean()
+		
 		Readout = torch.stack(Readout)[Last]
 		Target = torch.stack(Target)[Last]
 
@@ -439,9 +423,6 @@ class VGRNN(torch.nn.Module):
 			return x_NLL, z_KLD, adj_NLL, Readout, Target
 
 	def sep_batch(self, input, batch):
-		# [batch_size*num_nodes, num_node_features] -> [batch_size, num_nodes, num_node_features]
-		# output = torch.stack(input.split(self.num_nodes,dim=0), dim=0)
-		# output = torch.stack(unbatch(input, batch), dim=0)
 		output, _ = to_dense_batch(input, batch)
 		return output
 
@@ -456,7 +437,6 @@ class VGRNN(torch.nn.Module):
 		d_size = feat_sqm.shape[-2]
 		eps = torch.randn(batch_size, l_size, d_size).to(self.device, dtype=torch.float)
 		noise = node_sqm @ eps @ feat_sqm
-		# [batch_size, num_nodes, num_node_features] -> [batch_size*num_nodes, num_node_features]
 		return torch.flatten(mean + noise, end_dim=1)
 
 	def kld_normal_sb(self, mean_q, std_q, mean_p, std_p, reduce=False):
@@ -471,13 +451,9 @@ class VGRNN(torch.nn.Module):
 		n_size, m_size = mean_q.shape[1:]
 
 		node_cov_q = node_sqm_q @ torch.transpose(node_sqm_q, dim0=-2, dim1=-1)
-		# _, info = cholesky_ex(node_cov_q)
-		# rank = matrix_rank(node_cov_q)
-		# eig, _ = torch.linalg.eig(node_cov_q)
-		# print(torch.min(eig.real()))
 
 		nll_q = n_size*(2*torch.log(feat_std_q + self.EPS)).sum(dim=-1) + m_size*torch.log(det(node_cov_q) + self.EPS) + n_size*m_size
-		# nll_q = n_size*(2*torch.log(feat_std_q + self.EPS)).sum(dim=-1) + m_size*torch.log(torch.diagonal(node_cov_q, dim1=-2, dim2=-1) + self.EPS).sum(dim=-1) + n_size*m_size
+
 		nll_p_det = (2*torch.log(std_p + self.EPS)).sum(dim=[-1,-2])
 
 		UpVp = (std_p.pow(2) + self.EPS).pow(-1)
