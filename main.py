@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 from model import *
 from train import *
 
+def add(x,y):
+	return x+y
+
 outer_loop = 1; inner_loop = 1
 train_graphs, test_graphs, val_graphs = load_data(outer_loop, inner_loop)
 
