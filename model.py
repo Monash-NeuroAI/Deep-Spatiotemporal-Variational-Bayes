@@ -12,6 +12,9 @@ from torch_geometric.nn import Sequential, GCNConv, TransformerConv
 from torch_geometric.nn import global_mean_pool
 from torch_geometric.utils import negative_sampling, batched_negative_sampling, to_dense_batch, unbatch 
 
+def multiply():
+	return 5 * 2
+
 def get_device():
 	if torch.cuda.is_available():
 		torch.cuda.empty_cache()
