@@ -34,10 +34,6 @@ def get_fold_indices(labels):
 			train_idx = train_idx_out[train_idx_in]
 			val_idx = train_idx_out[val_idx_in]
 			test_idx = test_idx_out
-			
-			# np.random.shuffle(train_idx)
-			# np.random.shuffle(val_idx)
-			# np.random.shuffle(test_idx)
 
 			fold_idx['outer{}_inner{}'.format(i+1,j+1)] = dict()
 			fold_idx['outer{}_inner{}'.format(i+1,j+1)]['train'] = train_idx
@@ -108,7 +104,6 @@ def convert2graphs(Corr, Adj, SeqLen, Label):
 			# add edges to the graph
 			edgeIndex = index.T.long()
 			edgeAttr = values.unsqueeze(-1).float()
-			# num_edges = edge_index.shape[1]
 			adj_node = adj.float()
 			labeL = torch.tensor(label).long()
 
@@ -148,23 +143,12 @@ for i in range(1,6):
 		Corr, Adj, SeqLen, Label = get_fold_data(all_data_padded, all_adj_padded, seqlengths, labels, fold_indices, 'val', i, j)
 		val_graphs = convert2graphs(Corr, Adj, SeqLen, Label)
 
-		# del Corr, Adj, SeqLen, Label
-		# gc.collect()
-
 		graphs = {}
 		graphs['train_graphs'] = train_graphs
 		graphs['test_graphs'] = test_graphs
 		graphs['val_graphs'] = val_graphs
-		# graphs['train_seqlens'] = train_seqlens
-		# graphs['test_seqlens'] = test_seqlens
-		# graphs['val_seqlens'] = val_seqlens
 
 		print('Saving graphs ...')     
 		with open(saveTo+'graphs_outer'+str(i)+'_inner'+str(j)+'.pkl', 'wb') as f:
 			torch.save(graphs, f)
 			f.close()
-
-		# print('Saving graphs ...')     
-		# with shelve.open(saveTo+'graphs_outer'+str(i)+'_inner'+str(j)+'.db') as db:
-		# 	db['db'] = graphs
-		# 	db.close()
